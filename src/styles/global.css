@@ -634,3 +634,40 @@ footer.site-footer {
   font-style: italic;
   color: var(--slate-600);
 }
+/* Optional description box */
+.desc-field {
+  margin-top: 18px;
+}
+.desc-field label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.desc-field label span {
+  font-weight: 400;
+  color: var(--slate-600);
+}
+.desc-field textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-navy);
+  background: #f5eedd;
+  border: 1px solid var(--manila-edge);
+  border-radius: var(--radius-doc);
+}
+.desc-field textarea:focus {
+  outline: 2px solid var(--ink-navy);
+  outline-offset: 1px;
+}
+.desc-field__count {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--slate-600);
+  margin-top: 4px;
+}

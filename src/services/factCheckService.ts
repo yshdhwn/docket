@@ -202,15 +202,18 @@ async function runRealPipeline(
   onProgress?.([...steps]);
   return { ...result, contentType, inputLabel };
 }
-
-export async function analyzeImage(file: File, onProgress?: StepCallback): Promise<FactCheckResult> {
+export async function analyzeImage(
+  file: File,
+  onProgress?: StepCallback,
+  description = ''
+): Promise<FactCheckResult> {
   if (USE_REAL) {
     return runRealPipeline(
       'image',
       file.name,
       async () => {
         const { data, mediaType } = await imageToBase64(file);
-        return JSON.stringify({ image: data, mediaType, fileName: file.name });
+        return JSON.stringify({ image: data, mediaType, fileName: file.name, description });
       },
       onProgress
     );
@@ -218,17 +221,22 @@ export async function analyzeImage(file: File, onProgress?: StepCallback): Promi
   if (USE_MOCK) return runMockPipeline('image', file.name, onProgress);
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('description', description);
   return postToRealApi('image', formData);
 }
 
-export async function analyzeVideo(file: File, onProgress?: StepCallback): Promise<FactCheckResult> {
+export async function analyzeVideo(
+  file: File,
+  onProgress?: StepCallback,
+  description = ''
+): Promise<FactCheckResult> {
   if (USE_REAL) {
     return runRealPipeline(
       'video',
       file.name,
       async () => {
         const { frames, durationSec } = await extractVideoFrames(file);
-        return JSON.stringify({ frames, durationSec, fileName: file.name });
+        return JSON.stringify({ frames, durationSec, fileName: file.name, description });
       },
       onProgress
     );
@@ -236,16 +244,22 @@ export async function analyzeVideo(file: File, onProgress?: StepCallback): Promi
   if (USE_MOCK) return runMockPipeline('video', file.name, onProgress);
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('description', description);
   return postToRealApi('video', formData);
 }
 
-export async function analyzeUrl(url: string, onProgress?: StepCallback): Promise<FactCheckResult> {
+export async function analyzeUrl(
+  url: string,
+  onProgress?: StepCallback,
+  description = ''
+): Promise<FactCheckResult> {
   if (USE_REAL) {
-    return runRealPipeline('url', url, async () => JSON.stringify({ url }), onProgress);
+    return runRealPipeline('url', url, async () => JSON.stringify({ url, description }), onProgress);
   }
   if (USE_MOCK) return runMockPipeline('url', url, onProgress);
-  return postToRealApi('url', JSON.stringify({ url }), { 'Content-Type': 'application/json' });
+  return postToRealApi('url', JSON.stringify({ url, description }), { 'Content-Type': 'application/json' });
 }
+
 
 const HISTORY_KEY = 'factcheck.history';
 

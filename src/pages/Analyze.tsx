@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { UploadBox } from '../components/upload/UploadBox';
 import { FilePreview } from '../components/upload/FilePreview';
 import { UrlInput } from '../components/upload/UrlInput';
+import { DescriptionInput } from '../components/upload/DescriptionInput';
 import { AnalyzeButton } from '../components/upload/AnalyzeButton';
 import { PipelineSteps } from '../components/result/PipelineSteps';
 import { ResultCard } from '../components/result/ResultCard';
@@ -19,6 +20,7 @@ export function Analyze() {
   const [tab, setTab] = useState<ContentType>('image');
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState('');
+  const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
   const { status, steps, result, error, run, reset } = useFactCheck();
@@ -32,6 +34,7 @@ export function Analyze() {
     setTab(next);
     setFile(null);
     setUrl('');
+    setDescription('');
     setFormError(null);
     reset();
   }
@@ -47,6 +50,7 @@ export function Analyze() {
   }
 
   function handleSubmit() {
+    const note = description.trim();
     if (tab === 'url') {
       const check = validateUrl(url);
       if (!check.valid) {
@@ -54,16 +58,17 @@ export function Analyze() {
         return;
       }
       setFormError(null);
-      run('url', url.trim());
+      run('url', url.trim(), note);
       return;
     }
     if (!file) return;
-    run(tab === 'image' ? 'image' : 'video', file);
+    run(tab === 'image' ? 'image' : 'video', file, note);
   }
 
   function startOver() {
     setFile(null);
     setUrl('');
+    setDescription('');
     setFormError(null);
     reset();
   }
@@ -104,6 +109,12 @@ export function Analyze() {
                 <FilePreview file={file} kind={tab as 'image' | 'video'} onRemove={() => setFile(null)} />
               )}
               {tab === 'url' && <UrlInput value={url} onChange={setUrl} />}
+
+              <DescriptionInput
+                kind={tab as 'image' | 'video' | 'url'}
+                value={description}
+                onChange={setDescription}
+              />
 
               {formError && <p className="form-error">{formError}</p>}
               {status === 'error' && error && <p className="form-error">{error}</p>}
